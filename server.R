@@ -5,6 +5,8 @@ library(dplyr)
 my.server <- function(input, output) {
   # initialize food world cup data frame
   food <- read.csv("data/food-world-cup-data.csv")
+  colnames(food)[2] <- "Cuisine.Knowledge"
+
   
   # initialize US map
   us.map <-  map_data('state')
@@ -12,29 +14,21 @@ my.server <- function(input, output) {
   # add US Census Regions to us.maps data frame
   us.map$census.region[us.map$region %in% 
                          c("maine", "vermont", "new hampshire", "massachusetts", "connecticut", "rhode island")] <- "New England"
-  
   us.map$census.region[us.map$region %in% 
                          c("new jersey", "new york", "pennsylvania")] <- "Middle Atlantic"
-  
   us.map$census.region[us.map$region %in% 
                          c("illinois", "indiana", "michigan", "ohio", "wisconsin")] <- "East North Central"
-  
   us.map$census.region[us.map$region %in% 
                          c("iowa", "kansas", "minnesota", "missouri", "nebraska", "north dakota", "south dakota")] <- "West North Central"
-  
   us.map$census.region[us.map$region %in% 
                          c("delaware", "district of columbia", "maryland",
                            "west virginia", "virginia", "north carolina", "south carolina", "georgia", "florida")] <- "South Atlantic"
-  
   us.map$census.region[us.map$region %in% 
                          c("alabama", "kentucky", "mississippi", "tennessee")] <- "East South Central"
-  
   us.map$census.region[us.map$region %in% 
                          c("arkansas", "louisiana", "oklahoma", "texas")] <- "West South Central"
-  
   us.map$census.region[us.map$region %in% 
                          c("arizona", "montana", "idaho", "wyoming", "utah", "colorado", "nevada", "new mexico")] <- "Mountain"
-  
   us.map$census.region[us.map$region %in% 
                          c("washington", "oregon", "alaska", "california", "hawaii")] <- "Pacific"
   
@@ -86,9 +80,5 @@ my.server <- function(input, output) {
     
     return(region.gg)
   })
-  
-  
-  
-  
 }
 shinyServer(my.server)

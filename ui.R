@@ -13,7 +13,13 @@ my.ui <- fluidPage(
     
     # Initializes the widgets sidebar that includes radio buttons, sliders, and checkboxes
     sidebarPanel(
-      
+      # Creates radio buttons for users to be able to choose what percentage of the orignal raw 
+      # data values they wish to filter and view
+      radioButtons("dem", "Demographical Measure",
+                   c("Education Level" = "Education",
+                     "Household Income" = "Household.Income",
+                     "Age" = "Age",
+                     "Knowledge of World Cuisines" = "Cuisine.Knowledge"))
     ),
     
     # Initializes the main panel of the report, which should have two tabs to let the user revert 
