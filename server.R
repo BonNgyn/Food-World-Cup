@@ -1,12 +1,13 @@
 library(shiny)
 library(ggplot2)
 library(dplyr)
+library("mapproj")
 
 my.server <- function(input, output) {
   # initialize food world cup data frame
   food <- read.csv("data/food-world-cup-data.csv")
   colnames(food)[2] <- "Cuisine.Knowledge"
-
+  
   
   # initialize US map
   us.map <-  map_data('state')
@@ -63,6 +64,7 @@ my.server <- function(input, output) {
   # creates list of labels for each of the census regions
   regs <- aggregate(cbind(long.transp, lat.transp) ~ census.region, data=us.map, 
                     FUN=function(x)mean(range(x)))
+  
   
   # create the US map with the census regions separated
   output$map <- renderPlot({
