@@ -5,7 +5,7 @@ library("mapproj")
 
 my.server <- function(input, output) {
   # initialize food world cup data frame
-  food <- read.csv("Data/food-world-cup-data.csv", stringsAsFactors = FALSE)
+  food <- read.csv("Data/food-world-cup-data.csv", stringsAsFactors = FALSE, fileEncoding = "cp932")
   
   # cleaning up column names
   food <- food[,2:ncol(food)]
