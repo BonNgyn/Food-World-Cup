@@ -67,20 +67,8 @@ my.server <- function(input, output) {
   us.map$long.transp[us.map$census.region == "Pacific"] <- us.map$long[us.map$census.region == "Pacific"]
   
   # creates list of labels for each of the census regions
-  regs <- aggregate(cbind(long.transp, lat.transp) ~ census.region, data=us.map, 
-                    FUN=function(x)mean(range(x)))
-  
-  # calculates counts for each state
-  test <- select(na.omit(food), Household.Income, census.region) %>% 
-    group_by_("census.region") %>% 
-    summarise(
-      count = n() 
-    )
-  
-  
-  
-  # updates the us.map data frame with the calculated counts from test
-  us.map <- left_join(us.map, test, by = "census.region")
+  regs <- aggregate(cbind(long.transp, lat.transp) ~ census.region, data = us.map, 
+                    FUN = function(x)mean(range(x)))
   
   # create the US map with the census regions separated
   output$map <- renderPlotly({
@@ -101,15 +89,20 @@ my.server <- function(input, output) {
     return(region.gg)
   })
   
-  # text to help with debugging !!!!!!!!!! DELETE FOR FINAL PRODUCT !!!!!!!!!!!
+  # creates a reactive variable for the clicked region, converting the curveNumber to the region name
+
+  
   chosen.region <- reactive({
-    name <- event_data(event = "plotly_click", source = "A", session = shiny::getDefaultReactiveDomain())
+    region.number <- event_data("plotly_click")
+    region.number <- region.number$curveNumber
+    
+    # dictionary of region curveNumbers to corresponding region names
+    region.names <- list("0" = "East North Central", "1" = "East South Central", "2" = "Middle Atlantic", "3" = "Mountain", "4" = "New England", "5" = "Pacific", "6" = "South Atlantic", "7" = "West North Central", "8" = "West South Central", "9" = "East South Central")
+    
+    name <- region.names[[region.number]]
+    
     return(name)
   })
-  
-  output$click <- renderPrint({
-    d <- event_data("plotly_click")
-    if (is.null(d)) "Click on a state to view event data" else d
-  })
+
 }
 shinyServer(my.server)

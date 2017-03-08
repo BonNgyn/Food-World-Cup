@@ -27,8 +27,7 @@ my.ui <- fluidPage(
     # between a plot of the filtered data or a table of the filterd data. Both data forms have a 
     # short summary attached to the end to extend its usability.
     mainPanel(
-      plotlyOutput("map"),
-      verbatimTextOutput("click")
+      plotlyOutput("map")
     )
   )
 )
