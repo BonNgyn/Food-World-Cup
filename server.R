@@ -113,18 +113,16 @@ my.server <- function(input, output) {
       
       
     }
-    
-    
-    
     return(p)
-    
-    
-    
-    
-    
+
   })
     
-  
-  
+  filtered <- reactive({
+    data <- food %>% 
+      filter(census.region == "Pacific") %>% 
+      select_(input$dem, "Algeria:Ireland")
+    
+    return(data)
+  })
 }
 shinyServer(my.server)

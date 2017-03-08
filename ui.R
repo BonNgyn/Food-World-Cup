@@ -20,7 +20,7 @@ my.ui <- fluidPage(
                    c("Education Level" = "Education",
                      "Household Income" = "Household.Income",
                      "Age" = "Age",
-                     "Knowledge of World Cuisines" = "level.of.knowledge"))
+                     "Gender" = "Gender"))
     ),
     
     # Initializes the main panel of the report, which should have two tabs to let the user revert 
