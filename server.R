@@ -98,22 +98,45 @@ my.server <- function(input, output) {
     return(region.gg)
   })
   
-  output$plot <- renderPlot({
+  output$plot <- renderDataTable({
 
     
     if (input$dem == "Household.Income" || input$dem == "Age") {
-      age.and.income <- ggplot(data = filtered()) + 
-        geom_point(mapping = aes_string(x = "place", 
-                                        y = "holder")) 
+      #age.and.income <- ggplot(data = filtered()) + 
+        #geom_point(mapping = aes_string(x = "place", 
+                                        #y = "holder")) 
 
       
       
       
-    } else {
+    } else if (input$dem == "Education") {
       
+    } else { #gender 
+      
+      gender.data <- filtered() %>% 
+        group_by(`Gender`) %>% 
+        summarise_each(funs(mean(as.numeric(.), na.rm = TRUE)))
+      
+      # Females
+      females.data <- gender.data %>% 
+        filter(`Gender` == "Female")
+      females.data <- females.data[-1] %>% 
+        t() %>% 
+        as.data.frame() %>% 
+        mutate(Country = rownames(.)) %>% 
+        arrange(desc(`V1`))
+      
+      # Males
+      males.data <- gender.data %>% 
+        filter(`Gender` == "Male")
+      males.data <- males.data[-1] %>% 
+        t() %>% 
+        as.data.frame() %>% 
+        mutate(Country = rownames(.)) %>% 
+        arrange(desc(`V1`))
+      return(males.data)
       
     }
-    return(p)
 
   })
     

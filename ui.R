@@ -28,7 +28,7 @@ my.ui <- fluidPage(
     # short summary attached to the end to extend its usability.
     mainPanel(
       plotlyOutput("map"),
-      plotOutput("plot")
+      dataTableOutput("plot")
     )
   )
 )
