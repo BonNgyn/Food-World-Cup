@@ -6,8 +6,13 @@ library("mapproj")
 my.server <- function(input, output) {
   # initialize food world cup data frame
   food <- read.csv("Data/food-world-cup-data.csv", stringsAsFactors = FALSE)
-  colnames(food)[2] <- "Cuisine.Knowledge"
-  colnames(food)[48] <- "census.region"
+  
+  # cleaning up column names
+  food <- food[,2:ncol(food)]
+  food.colnames <- colnames(food)
+  food.colnames <- gsub('Please.rate.how.much.you.like.the.traditional.cuisine.of.', '', food.colnames)
+  countries.names <- gsub('[.]', '', food.colnames[3:42])
+  colnames(food) <- c('level.of.knowledge', 'interest', countries.names, 'Gender', 'Age', 'Household.Income', 'Education', 'census.region')
   
   # initialize US map
   us.map <-  map_data('state')
@@ -78,7 +83,7 @@ my.server <- function(input, output) {
   # create the US map with the census regions separated
   output$map <- renderPlotly({
     region.gg <- ggplot(us.map, aes(x = long.transp, y = lat.transp), colour = "white") + 
-      geom_polygon(aes(group = group, fill = count)) +
+      geom_polygon(aes(text = census.region, group = group, fill = count)) +
       geom_text(data = regs, aes(long.transp, lat.transp, label = census.region), size = 3) +
       theme(panel.background = element_blank(),  # remove background
             panel.grid = element_blank(), 
@@ -88,7 +93,7 @@ my.server <- function(input, output) {
             axis.text = element_blank())
       coord_equal()
     
-    region.gg <- ggplotly(region.gg, tooltip = c("census.region"))
+    region.gg <- ggplotly(region.gg)
     
     return(region.gg)
   })
