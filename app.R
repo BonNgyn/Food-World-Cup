@@ -80,11 +80,4 @@ g <- ggplot(us.map, aes(x=long.transp, y=lat.transp)) +
         legend.position = "none") + # remove legend
   coord_equal()
 
-neStates <- subset(us.map, us.map$region %in% 
-                     c("washington", "oregon", "alaska", "california", "hawaii"))
-
-leaflet(us.map) %>%
-  addPolygons(highlightOptions = highlightOptions(color = "white", weight = 2,
-                                                  bringToFront = TRUE))
-
 shinyApp(my.ui, my.server)

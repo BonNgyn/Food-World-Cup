@@ -20,7 +20,7 @@ my.ui <- fluidPage(
                      "Household Income" = "Household.Income",
                      "Age" = "Age",
                      "Knowledge of World Cuisines" = "Cuisine.Knowledge")),
-      verbatimTextOutput(outputId="coords")
+      verbatimTextOutput(outputId="region")
     ),
     
     # Initializes the main panel of the report, which should have two tabs to let the user revert 
