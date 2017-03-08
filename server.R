@@ -97,5 +97,34 @@ my.server <- function(input, output) {
     
     return(region.gg)
   })
+  
+  output$plot <- renderPlot({
+
+    
+    if (input$dem == "Household.Income" || input$dem == "Age") {
+      age.and.income <- ggplot(data = filtered()) + 
+        geom_point(mapping = aes_string(x = "place", 
+                                        y = "holder")) 
+
+      
+      
+      
+    } else {
+      
+      
+    }
+    
+    
+    
+    return(p)
+    
+    
+    
+    
+    
+  })
+    
+  
+  
 }
 shinyServer(my.server)
