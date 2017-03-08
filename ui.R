@@ -19,7 +19,8 @@ my.ui <- fluidPage(
                    c("Education Level" = "Education",
                      "Household Income" = "Household.Income",
                      "Age" = "Age",
-                     "Knowledge of World Cuisines" = "Cuisine.Knowledge"))
+                     "Knowledge of World Cuisines" = "Cuisine.Knowledge")),
+      verbatimTextOutput(outputId="coords")
     ),
     
     # Initializes the main panel of the report, which should have two tabs to let the user revert 
@@ -27,7 +28,7 @@ my.ui <- fluidPage(
     # short summary attached to the end to extend its usability.
     mainPanel(
       tabsetPanel(type = "tabs", 
-                  tabPanel("Map", plotOutput("map"))
+                  tabPanel("Map", plotOutput("map", click = "plot_click"))
       )
     )
   )
