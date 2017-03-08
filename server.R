@@ -5,7 +5,7 @@ library("mapproj")
 
 my.server <- function(input, output) {
   # initialize food world cup data frame
-  food <- read.csv("Data/food-world-cup-data.csv", stringsAsFactors = FALSE, fileEncoding = "cp932")
+  food <- read.csv("Data/food-world-cup-data.csv", stringsAsFactors = FALSE)
   
   # cleaning up column names
   food <- food[,2:ncol(food)]
@@ -67,30 +67,21 @@ my.server <- function(input, output) {
   us.map$long.transp[us.map$census.region == "Pacific"] <- us.map$long[us.map$census.region == "Pacific"]
   
   # creates list of labels for each of the census regions
-  regs <- aggregate(cbind(long.transp, lat.transp) ~ census.region, data=us.map, 
-                    FUN=function(x)mean(range(x)))
-  
-  # calculates counts for each state
-  test <- select(na.omit(food), Household.Income, census.region) %>% 
-    group_by_("census.region") %>% 
-    summarise(
-      count = n() 
-    )
-  
-  # updates the us.map data frame with the calculated counts from test
-  us.map <- left_join(us.map, test, by = "census.region")
+  regs <- aggregate(cbind(long.transp, lat.transp) ~ census.region, data = us.map, 
+                    FUN = function(x)mean(range(x)))
   
   # create the US map with the census regions separated
   output$map <- renderPlotly({
     region.gg <- ggplot(us.map, aes(x = long.transp, y = lat.transp), colour = "white") + 
-      geom_polygon(aes(text = census.region, group = group, fill = count)) +
+      geom_polygon(aes(text = census.region, group = group, fill = census.region), colour = 'white') +
       geom_text(data = regs, aes(long.transp, lat.transp, label = census.region), size = 3) +
       theme(panel.background = element_blank(),  # remove background
             panel.grid = element_blank(), 
             axis.line = element_blank(), 
             axis.title = element_blank(),
             axis.ticks = element_blank(),
-            axis.text = element_blank())
+            axis.text = element_blank(),
+            legend.position = "none")
       coord_equal()
     
     region.gg <- ggplotly(region.gg)
@@ -180,5 +171,18 @@ my.server <- function(input, output) {
     return(gender.data[1:10,])
   }
   
+  # creates a reactive variable for the clicked region, converting the curveNumber to the region name
+ 
+  chosen.region <- reactive({
+    region.number <- event_data("plotly_click")
+    region.number <- region.number$curveNumber
+    
+    # dictionary of region curveNumbers to corresponding region names
+    region.names <- list("0" = "East North Central", "1" = "East South Central", "2" = "Middle Atlantic", "3" = "Mountain", "4" = "New England", "5" = "Pacific", "6" = "South Atlantic", "7" = "West North Central", "8" = "West South Central", "9" = "East South Central")
+    
+    name <- region.names[[region.number]]
+    
+    return(name)
+  })
 }
 shinyServer(my.server)
