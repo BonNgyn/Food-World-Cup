@@ -5,7 +5,7 @@ library("mapproj")
 
 my.server <- function(input, output) {
   # initialize food world cup data frame
-  food <- read.csv("Data/food-world-cup-data.csv", stringsAsFactors = FALSE, fileEncoding = "cp932")
+  food <- read.csv("Data/food-world-cup-data.csv", stringsAsFactors = FALSE)
   
   # cleaning up column names
   food <- food[,2:ncol(food)]
@@ -77,25 +77,39 @@ my.server <- function(input, output) {
       count = n() 
     )
   
+  
+  
   # updates the us.map data frame with the calculated counts from test
   us.map <- left_join(us.map, test, by = "census.region")
   
   # create the US map with the census regions separated
   output$map <- renderPlotly({
     region.gg <- ggplot(us.map, aes(x = long.transp, y = lat.transp), colour = "white") + 
-      geom_polygon(aes(text = census.region, group = group, fill = count)) +
+      geom_polygon(aes(text = census.region, group = group, fill = census.region), colour = 'white') +
       geom_text(data = regs, aes(long.transp, lat.transp, label = census.region), size = 3) +
       theme(panel.background = element_blank(),  # remove background
             panel.grid = element_blank(), 
             axis.line = element_blank(), 
             axis.title = element_blank(),
             axis.ticks = element_blank(),
-            axis.text = element_blank())
+            axis.text = element_blank(),
+            legend.position = "none")
       coord_equal()
     
     region.gg <- ggplotly(region.gg)
     
     return(region.gg)
+  })
+  
+  # text to help with debugging !!!!!!!!!! DELETE FOR FINAL PRODUCT !!!!!!!!!!!
+  chosen.region <- reactive({
+    name <- event_data(event = "plotly_click", source = "A", session = shiny::getDefaultReactiveDomain())
+    return(name)
+  })
+  
+  output$click <- renderPrint({
+    d <- event_data("plotly_click")
+    if (is.null(d)) "Click on a state to view event data" else d
   })
 }
 shinyServer(my.server)

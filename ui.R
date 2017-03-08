@@ -20,14 +20,15 @@ my.ui <- fluidPage(
                    c("Education Level" = "Education",
                      "Household Income" = "Household.Income",
                      "Age" = "Age",
-                     "Knowledge of World Cuisines" = "Cuisine.Knowledge"))
+                     "Knowledge of World Cuisines" = "level.of.knowledge"))
     ),
     
     # Initializes the main panel of the report, which should have two tabs to let the user revert 
     # between a plot of the filtered data or a table of the filterd data. Both data forms have a 
     # short summary attached to the end to extend its usability.
     mainPanel(
-      plotlyOutput("map")
+      plotlyOutput("map"),
+      verbatimTextOutput("click")
     )
   )
 )
