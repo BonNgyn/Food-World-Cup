@@ -2,6 +2,7 @@ library(shiny)
 library(ggplot2)
 library(dplyr)
 library(rsconnect)
+library(plotly)
 
 my.ui <- fluidPage(
   # Creates a title panel to introduce an overview of the report
@@ -27,9 +28,11 @@ my.ui <- fluidPage(
     # short summary attached to the end to extend its usability.
     mainPanel(
       tabsetPanel(type = "tabs", 
-                  tabPanel("Map", plotOutput("map"))
+                  tabPanel("Map", plotlyOutput("map"))
       )
     )
-  )
+  ),
+  verbatimTextOutput("click")
 )
 shinyUI(my.ui)
+
