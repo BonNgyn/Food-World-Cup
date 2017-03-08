@@ -98,7 +98,7 @@ my.server <- function(input, output) {
     return(region.gg)
   })
   
-  output$plot <- renderDataTable({
+  output$plot <- renderPlot({
 
     
     if (input$dem == "Household.Income" || input$dem == "Age") {
@@ -125,6 +125,12 @@ my.server <- function(input, output) {
         as.data.frame() %>% 
         mutate(Country = rownames(.)) %>% 
         arrange(desc(`V1`))
+      colnames(females.data) <- c("Average", "Country")
+      
+      p <- ggplot(data = females.data[1:10,]) +
+        geom_point(mapping = aes(x = `Country`, y=`Average`, color=`Country`), stat = "identity") + 
+        scale_x_discrete(limits= females.data[1:10,]$Country)
+      return(p)
       
       # Males
       males.data <- gender.data %>% 
@@ -134,10 +140,12 @@ my.server <- function(input, output) {
         as.data.frame() %>% 
         mutate(Country = rownames(.)) %>% 
         arrange(desc(`V1`))
-      return(males.data)
+      colnames(males.data) <- c("Average", "Country")
       
+      p <- ggplot(data = males.data[1:10,]) +
+        geom_point(mapping = aes(x = `Country`, y=`Average`, color=`Country`), stat = "identity") + 
+        scale_x_discrete(limits= males.data[1:10,]$Country)
     }
-
   })
     
   filtered <- reactive({
