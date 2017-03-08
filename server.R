@@ -98,53 +98,60 @@ my.server <- function(input, output) {
     return(region.gg)
   })
   
+  output$plot2 <- renderPlot({
+    if (input$dem == "Gender") {
+      # Males
+      males.data <- getFilteredGender(filtered(), "Male")
+      
+      p <- ggplot(data = males.data[1:10,]) +
+        geom_bar(mapping = aes(x = `Country`, y=`Average`, width = 0.4, fill = `Average`),
+                 stat = "identity") + 
+        scale_x_discrete(limits= males.data[1:10,]$Country) + 
+        labs(title = "Top 10 Countries' Cuisines enjoyed by Males",
+             x = "Country that Traditional Cuisine is From",
+             y = "Average Rating (Scale 1-5)")
+      return(p)
+    }
+    
+  })
+  
   output$plot <- renderPlot({
 
-    
     if (input$dem == "Household.Income" || input$dem == "Age") {
       #age.and.income <- ggplot(data = filtered()) + 
         #geom_point(mapping = aes_string(x = "place", 
                                         #y = "holder")) 
 
-      
-      
-      
+
     } else if (input$dem == "Education") {
+      education.data <- filtered() %>% 
+        group_by(`Education`) %>% 
+        summarise_each(funs(mean(as.numeric(.), na.rm = TRUE)))
+      education.long <- gather(education.data, key = Country, value = Average, 
+                              Algeria:Ireland)
+      education.long <- education.long %>% 
+        filter(Education != "") %>% 
+        group_by(`Education`) %>% 
+        arrange(desc(`Average`))%>% 
+        top_n(10)
+      
+      p <- ggplot(data = education.long) +
+        geom_point(mapping = aes(x = `Education`, y = `Average`, color = `Country`))
+      return(p)
       
     } else { #gender 
       
-      gender.data <- filtered() %>% 
-        group_by(`Gender`) %>% 
-        summarise_each(funs(mean(as.numeric(.), na.rm = TRUE)))
-      
       # Females
-      females.data <- gender.data %>% 
-        filter(`Gender` == "Female")
-      females.data <- females.data[-1] %>% 
-        t() %>% 
-        as.data.frame() %>% 
-        mutate(Country = rownames(.)) %>% 
-        arrange(desc(`V1`))
-      colnames(females.data) <- c("Average", "Country")
+      females.data <- getFilteredGender(filtered(), "Female")
       
-      p <- ggplot(data = females.data[1:10,]) +
-        geom_point(mapping = aes(x = `Country`, y=`Average`, color=`Country`), stat = "identity") + 
-        scale_x_discrete(limits= females.data[1:10,]$Country)
+      p <- ggplot(data = females.data) +
+        geom_bar(mapping = aes(x = `Country`, y=`Average`, width = 0.4, fill = `Average`),
+                 stat = "identity") + 
+        scale_x_discrete(limits= females.data$Country) + 
+        labs(title = "Top 10 Countries' Cuisines enjoyed by Females",
+             x = "Country that Traditional Cuisine is From",
+             y = "Average Rating (Scale 1-5)")
       return(p)
-      
-      # Males
-      males.data <- gender.data %>% 
-        filter(`Gender` == "Male")
-      males.data <- males.data[-1] %>% 
-        t() %>% 
-        as.data.frame() %>% 
-        mutate(Country = rownames(.)) %>% 
-        arrange(desc(`V1`))
-      colnames(males.data) <- c("Average", "Country")
-      
-      p <- ggplot(data = males.data[1:10,]) +
-        geom_point(mapping = aes(x = `Country`, y=`Average`, color=`Country`), stat = "identity") + 
-        scale_x_discrete(limits= males.data[1:10,]$Country)
     }
   })
     
@@ -155,5 +162,23 @@ my.server <- function(input, output) {
     
     return(data)
   })
+  
+  getFilteredGender <- function(data, gender) {
+    
+    filtered.data <- data %>% 
+      group_by(`Gender`) %>% 
+      summarise_each(funs(mean(as.numeric(.), na.rm = TRUE)))
+    
+    gender.data <- filtered.data %>% 
+      filter(`Gender` == gender)
+    gender.data <- gender.data[-1] %>% 
+      t() %>% 
+      as.data.frame() %>% 
+      mutate(Country = rownames(.)) %>% 
+      arrange(desc(`V1`))
+    colnames(gender.data) <- c("Average", "Country")  
+    return(gender.data[1:10,])
+  }
+  
 }
 shinyServer(my.server)
