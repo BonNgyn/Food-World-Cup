@@ -11,6 +11,7 @@ my.ui <- fluidPage(theme = "bootstrap.css",
   # Creates a title panel to introduce an overview of the report
   titlePanel("Food World Cup"),
   
+  tags$style("body {background-color: #ECEAE0; }"),
   tags$style(type="text/css", ".shiny-output-error { visibility: hidden; }",
              ".shiny-output-error:before { visibility: hidden; }"),
   # Introduction paragraph                  
@@ -32,6 +33,8 @@ my.ui <- fluidPage(theme = "bootstrap.css",
 
   # Displays the map of the U.S.
   plotlyOutput("map"), hr(),
+  # Outputs the various demographic plot(s)
+  plotlyOutput('top.food'), hr(),
   fluidRow(
     column(5, offset = 4, 
            radioButtons("dem", "Demographical Measure",
@@ -41,12 +44,8 @@ my.ui <- fluidPage(theme = "bootstrap.css",
                           "Gender" = "Gender"))
     )
   ), p(strong(textOutput('region.name', inline=TRUE))),
-
   # Outputs the various demographic plot descriptions
   p(textOutput('plot.desc', inlin=TRUE)),
-
-  # Outputs the various demographic plot(s)
-  plotlyOutput('top.food'),
   plotlyOutput("plot"),
   plotlyOutput("plot2")
 )
