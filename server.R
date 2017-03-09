@@ -157,11 +157,8 @@ my.server <- function(input, output) {
     countries <- factor(GetFilteredTop()$countries.names, 
                         levels = unique(GetFilteredTop()$countries.names)[order(GetFilteredTop()$means, decreasing = TRUE)])
     p <- plot_ly(x = countries, y = GetFilteredTop()$means, type = "bar") %>% 
-      layout(title = "Top 10 Rated Cuisines") %>% 
+      layout(title = "Top 10 Rated Cuisines", titlefont = f) %>% 
       layout(xaxis = x, yaxis = y)
-    
-    p2 <- ggplot(food.mean, aes(x = reorder(countries.names, -means), y = means)) +
-      geom_bar(stat = "identity")
     return(p)
   })
 }
