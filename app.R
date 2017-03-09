@@ -5,8 +5,6 @@ library(plotly)
 library(dplyr)
 library(tidyr)
 
-
-
 # initialize food world cup data frame
 food <- read.csv("Data/food-world-cup-data.csv", stringsAsFactors = FALSE, fileEncoding = "cp932")
 

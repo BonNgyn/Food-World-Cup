@@ -7,7 +7,7 @@ my.server <- function(input, output) {
   # create the US map with the census regions separated
   output$map <- renderPlotly({
     region.gg <- ggplot(us.map, aes(x = long.transp, y = lat.transp), colour = "white") + 
-      geom_polygon(aes(text = census.region, group = group, fill = census.region), colour = 'white') +
+      geom_polygon(aes(group = group, fill = census.region), colour = 'white') +
       theme(panel.background = element_blank(),  # remove background
             panel.grid = element_blank(), 
             axis.line = element_blank(), 
