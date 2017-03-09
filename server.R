@@ -1,75 +1,9 @@
 library(shiny)
 library(ggplot2)
 library(dplyr)
-library("mapproj")
+library(mapproj)
 
 my.server <- function(input, output) {
-  # initialize food world cup data frame
-  food <- read.csv("Data/food-world-cup-data.csv", stringsAsFactors = FALSE, fileEncoding = "cp932")
-  
-  # cleaning up column names
-  food <- food[,2:ncol(food)]
-  food.colnames <- colnames(food)
-  food.colnames <- gsub('Please.rate.how.much.you.like.the.traditional.cuisine.of.', '', food.colnames)
-  countries.names <- gsub('[.]', '', food.colnames[3:42])
-  colnames(food) <- c('level.of.knowledge', 'interest', countries.names, 'Gender', 'Age', 'Household.Income', 'Education', 'census.region')
-  
-  # initialize US map
-  us.map <-  map_data('state')
-  
-  # add US Census Regions to us.maps data frame
-  us.map$census.region[us.map$region %in% 
-                         c("maine", "vermont", "new hampshire", "massachusetts", "connecticut", "rhode island")] <- "New England"
-  us.map$census.region[us.map$region %in% 
-                         c("new jersey", "new york", "pennsylvania")] <- "Middle Atlantic"
-  us.map$census.region[us.map$region %in% 
-                         c("illinois", "indiana", "michigan", "ohio", "wisconsin")] <- "East North Central"
-  us.map$census.region[us.map$region %in% 
-                         c("iowa", "kansas", "minnesota", "missouri", "nebraska", "north dakota", "south dakota")] <- "West North Central"
-  us.map$census.region[us.map$region %in% 
-                         c("delaware", "district of columbia", "maryland",
-                           "west virginia", "virginia", "north carolina", "south carolina", "georgia", "florida")] <- "South Atlantic"
-  us.map$census.region[us.map$region %in% 
-                         c("alabama", "kentucky", "mississippi", "tennessee")] <- "East South Central"
-  us.map$census.region[us.map$region %in% 
-                         c("arkansas", "louisiana", "oklahoma", "texas")] <- "West South Central"
-  us.map$census.region[us.map$region %in% 
-                         c("arizona", "montana", "idaho", "wyoming", "utah", "colorado", "nevada", "new mexico")] <- "Mountain"
-  us.map$census.region[us.map$region %in% 
-                         c("washington", "oregon", "alaska", "california", "hawaii")] <- "Pacific"
-  
-  # subset the dataframe by census regions and move lat/lon accordingly
-  us.map$lat.transp[us.map$census.region == "New England"] <- us.map$lat[us.map$census.region == "New England"]
-  us.map$long.transp[us.map$census.region == "New England"] <- us.map$long[us.map$census.region == "New England"]
-  
-  us.map$lat.transp[us.map$census.region == "Middle Atlantic"] <- us.map$lat[us.map$census.region == "Middle Atlantic"]
-  us.map$long.transp[us.map$census.region == "Middle Atlantic"] <- us.map$long[us.map$census.region == "Middle Atlantic"]
-  
-  us.map$lat.transp[us.map$census.region == "East North Central"] <- us.map$lat[us.map$census.region == "East North Central"]
-  us.map$long.transp[us.map$census.region == "East North Central"] <- us.map$long[us.map$census.region == "East North Central"]
-  
-  us.map$lat.transp[us.map$census.region == "West North Central"] <- us.map$lat[us.map$census.region == "West North Central"]
-  us.map$long.transp[us.map$census.region == "West North Central"] <- us.map$long[us.map$census.region == "West North Central"]
-  
-  us.map$lat.transp[us.map$census.region == "South Atlantic"] <- us.map$lat[us.map$census.region == "South Atlantic"]
-  us.map$long.transp[us.map$census.region == "South Atlantic"] <- us.map$long[us.map$census.region == "South Atlantic"]
-  
-  us.map$lat.transp[us.map$census.region == "East South Central"] <- us.map$lat[us.map$census.region == "East South Central"]
-  us.map$long.transp[us.map$census.region == "East South Central"] <- us.map$long[us.map$census.region == "East South Central"]
-  
-  us.map$lat.transp[us.map$census.region == "West South Central"] <- us.map$lat[us.map$census.region == "West South Central"]
-  us.map$long.transp[us.map$census.region == "West South Central"] <- us.map$long[us.map$census.region == "West South Central"]
-  
-  us.map$lat.transp[us.map$census.region == "Mountain"] <- us.map$lat[us.map$census.region == "Mountain"]
-  us.map$long.transp[us.map$census.region == "Mountain"] <- us.map$long[us.map$census.region == "Mountain"]
-  
-  us.map$lat.transp[us.map$census.region == "Pacific"] <- us.map$lat[us.map$census.region == "Pacific"]
-  us.map$long.transp[us.map$census.region == "Pacific"] <- us.map$long[us.map$census.region == "Pacific"]
-  
-  # creates list of labels for each of the census regions
-  regs <- aggregate(cbind(long.transp, lat.transp) ~ census.region, data = us.map, 
-                    FUN = function(x)mean(range(x)))
-  
   # create the US map with the census regions separated
   output$map <- renderPlotly({
     region.gg <- ggplot(us.map, aes(x = long.transp, y = lat.transp), colour = "white") + 
@@ -89,7 +23,25 @@ my.server <- function(input, output) {
     return(region.gg)
   })
   
-  output$plot2 <- renderPlot({
+  # creates a reactive variable for the clicked region, converting the curveNumber to the region name
+  chosen.region <- reactive({
+    region.number <- event_data("plotly_click")
+    if (!is.null(region.number)) {
+      region.number <- region.number$curveNumber
+      
+      # dictionary of region curveNumbers to corresponding region names
+      region.names <- c("East North Central", "East South Central", "Middle Atlantic", 
+                        "Mountain", "New England", "Pacific", "South Atlantic", 
+                        "West North Central", "West South Central")
+      
+      name <- region.names[region.number + 1]
+      return(name)
+    } else {
+      return("")
+    }
+  })
+  
+  output$gender.male <- renderPlot({
     if (!is.null(filtered())) {
       if (input$dem == "Gender") {
         # Males
@@ -114,7 +66,6 @@ my.server <- function(input, output) {
         #geom_point(mapping = aes_string(x = "place", 
                                             #y = "holder")) 
     
-    
       } else if (input$dem == "Education") {
         education.data <- filtered() %>% 
           group_by(`Education`) %>% 
@@ -132,7 +83,6 @@ my.server <- function(input, output) {
         return(p)
           
       } else { #gender 
-          
         # Females
         females.data <- getFilteredGender(filtered(), "Female")
           
@@ -175,22 +125,45 @@ my.server <- function(input, output) {
     return(gender.data[1:10,])
   }
   
-  # creates a reactive variable for the clicked region, converting the curveNumber to the region name
-  chosen.region <- reactive({
-    region.number <- event_data("plotly_click")
-    if (!is.null(region.number)) {
-    region.number <- region.number$curveNumber
+  GetFilteredTop <- reactive({
+    #Getting average of all cuisines 
+    top.food <- food %>% filter(census.region == chosen.region()) %>% 
+      select(3:42)
     
-    # dictionary of region curveNumbers to corresponding region names
-    region.names <- c("East North Central", "East South Central", "Middle Atlantic", 
-                         "Mountain", "New England", "Pacific", "South Atlantic", 
-                        "West North Central", "West South Central")
-    
-    name <- region.names[region.number + 1]
-    return(name)
-    } else {
-      return("")
+    #making dataframe 
+    means <- c()
+    for(country in countries.names) {
+      means <- c(means, mean(as.numeric(top.food[,country]), na.rm = TRUE))
     }
+    food.mean <- data.frame(countries.names, means) %>% 
+      arrange(desc(means)) %>% 
+      top_n(n = 10, means)
+    return(food.mean)
+  })
+  
+  output$top.food <- renderPlotly({
+    f <- list(
+      family = "Courier New, monospace",
+      size = 16
+    )
+    x <- list(
+      title = "Top Rated Cuisines",
+      titlefont = f
+    )
+    y <- list(
+      title = "Average Rating (1-5)",
+      titlefont = f
+    )
+    
+    countries <- factor(GetFilteredTop()$countries.names, 
+                        levels = unique(GetFilteredTop()$countries.names)[order(GetFilteredTop()$means, decreasing = TRUE)])
+    p <- plot_ly(x = countries, y = GetFilteredTop()$means, type = "bar") %>% 
+      layout(title = "Top 10 Rated Cuisines") %>% 
+      layout(xaxis = x, yaxis = y)
+    
+    p2 <- ggplot(food.mean, aes(x = reorder(countries.names, -means), y = means)) +
+      geom_bar(stat = "identity")
+    return(p)
   })
 }
 shinyServer(my.server)

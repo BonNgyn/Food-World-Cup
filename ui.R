@@ -1,8 +1,10 @@
+#install.packages('shinydashboard')
 library(shiny)
 library(ggplot2)
 library(dplyr)
 library(rsconnect)
 library(plotly)
+library(shinydashboard)
 
 my.ui <- fluidPage(
   # Creates a title panel to introduce an overview of the report
@@ -28,8 +30,9 @@ my.ui <- fluidPage(
     # short summary attached to the end to extend its usability.
     mainPanel(
       plotlyOutput("map"),
+      plotlyOutput('top.food'),
       plotOutput("plot"),
-      plotOutput("plot2")
+      plotOutput("gender.male")
     )
   )
 )
