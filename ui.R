@@ -27,10 +27,12 @@ my.ui <- fluidPage(
     # Initializes the main panel of the report, which should have two tabs to let the user revert 
     # between a plot of the filtered data or a table of the filterd data. Both data forms have a 
     # short summary attached to the end to extend its usability.
-    mainPanel(
+    mainPanel(tags$style(type="text/css",
+              ".shiny-output-error { visibility: hidden; }",
+              ".shiny-output-error:before { visibility: hidden; }"),
       plotlyOutput("map"),
-      plotOutput("plot"),
-      plotOutput("plot2")
+      plotlyOutput("plot"),
+      plotlyOutput("plot2")
     )
   )
 )

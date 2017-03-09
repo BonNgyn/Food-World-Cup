@@ -2,6 +2,7 @@ library(shiny)
 library(ggplot2)
 library(dplyr)
 library(tidyr)
+library(plotly)
 library(mapproj)
 
 my.server <- function(input, output) {
@@ -140,7 +141,7 @@ my.server <- function(input, output) {
     return(region.gg)
   })
   
-  output$plot2 <- renderPlot({
+  output$plot2 <- renderPlotly({
     if (!is.null(filtered())) {
       if (input$dem == "Gender") {
         # Males
@@ -153,12 +154,13 @@ my.server <- function(input, output) {
           labs(title = "Top 10 Countries' Cuisines enjoyed by Males",
               x = "Country that Traditional Cuisine is From",
               y = "Average Rating (Scale 1-5)")
+        p <- ggplotly(p)
         return(p)
       }
     }
   })
   
-  output$plot <- renderPlot({
+  output$plot <- renderPlotly({
     if (!is.null(filtered())) {
       if (input$dem == "Age") {
         
@@ -173,7 +175,7 @@ my.server <- function(input, output) {
         
         age.plot <- ggplot(data = age.long) +
           geom_point(mapping = aes(x = Age, y = Average, color = Country), size = 5)
-          
+        age.plot <- ggplotly(age.plot)
         return(age.plot)
         
       } else if(input$dem == "Household.Income") {
@@ -189,7 +191,7 @@ my.server <- function(input, output) {
         
         income.plot <- ggplot(data = income.long) +
           geom_point(mapping = aes(x = Household.Income, y = Average, color = Country), size = 5)
-        
+        income.plot <- ggplotly(income.plot)
         return(income.plot)
         
       } else if (input$dem == "Education") {
@@ -205,7 +207,9 @@ my.server <- function(input, output) {
           top_n(10)
           
         p <- ggplot(data = education.long) +
-          geom_point(mapping = aes(x = `Education`, y = `Average`, color = `Country`))
+          geom_point(mapping = aes(x = `Education`, y = `Average`, color = `Country`), size = 5)
+        p <- ggplotly(p)
+        
         return(p)
           
       } else { #gender 
@@ -220,10 +224,12 @@ my.server <- function(input, output) {
         labs(title = "Top 10 Countries' Cuisines enjoyed by Females",
             x = "Country that Traditional Cuisine is From",
             y = "Average Rating (Scale 1-5)")
+        p <- ggplotly(p)
         return(p)
       }
     }
   })
+  
+  
 }
-
 shinyServer(my.server)
