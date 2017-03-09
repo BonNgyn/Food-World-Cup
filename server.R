@@ -10,6 +10,16 @@ my.server <- function(input, output) {
   ## Map Initialization ##
   ########################
   
+  # initialize food world cup data frame
+  food <- read.csv("Data/food-world-cup-data.csv", stringsAsFactors = FALSE, fileEncoding = "cp932")
+  
+  # cleaning up column names
+  food <- food[,2:ncol(food)]
+  food.colnames <- colnames(food)
+  food.colnames <- gsub('Please.rate.how.much.you.like.the.traditional.cuisine.of.', '', food.colnames)
+  countries.names <- gsub('[.]', '', food.colnames[3:42])
+  colnames(food) <- c('level.of.knowledge', 'interest', countries.names, 'Gender', 'Age', 'Household.Income', 'Education', 'census.region')
+  
   # initialize US map
   us.map <-  map_data('state')
   
