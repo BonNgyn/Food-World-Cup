@@ -74,7 +74,6 @@ my.server <- function(input, output) {
   output$map <- renderPlotly({
     region.gg <- ggplot(us.map, aes(x = long.transp, y = lat.transp), colour = "white") + 
       geom_polygon(aes(text = census.region, group = group, fill = census.region), colour = 'white') +
-      geom_text(data = regs, aes(long.transp, lat.transp, label = census.region), size = 3) +
       theme(panel.background = element_blank(),  # remove background
             panel.grid = element_blank(), 
             axis.line = element_blank(), 
