@@ -5,7 +5,7 @@ library("mapproj")
 
 my.server <- function(input, output) {
   # initialize food world cup data frame
-  food <- read.csv("Data/food-world-cup-data.csv", stringsAsFactors = FALSE)
+  food <- read.csv("Data/food-world-cup-data.csv", stringsAsFactors = FALSE, fileEncoding = "cp932")
   
   # cleaning up column names
   food <- food[,2:ncol(food)]
@@ -90,68 +90,72 @@ my.server <- function(input, output) {
   })
   
   output$plot2 <- renderPlot({
-    if (input$dem == "Gender") {
-      # Males
-      males.data <- getFilteredGender(filtered(), "Male")
-      
-      p <- ggplot(data = males.data[1:10,]) +
-        geom_bar(mapping = aes(x = `Country`, y=`Average`, width = 0.4, fill = `Average`),
-                 stat = "identity") + 
-        scale_x_discrete(limits= males.data[1:10,]$Country) + 
-        labs(title = "Top 10 Countries' Cuisines enjoyed by Males",
-             x = "Country that Traditional Cuisine is From",
-             y = "Average Rating (Scale 1-5)")
-      return(p)
+    if (!is.null(filtered())) {
+      if (input$dem == "Gender") {
+        # Males
+        males.data <- getFilteredGender(filtered(), "Male")
+          
+        p <- ggplot(data = males.data[1:10,]) +
+          geom_bar(mapping = aes(x = `Country`, y=`Average`, width = 0.4, fill = `Average`),
+                  stat = "identity") + 
+          scale_x_discrete(limits= males.data[1:10,]$Country) + 
+          labs(title = "Top 10 Countries' Cuisines enjoyed by Males",
+              x = "Country that Traditional Cuisine is From",
+              y = "Average Rating (Scale 1-5)")
+        return(p)
+      }
     }
-    
   })
   
   output$plot <- renderPlot({
-
-    if (input$dem == "Household.Income" || input$dem == "Age") {
-      #age.and.income <- ggplot(data = filtered()) + 
+    if (!is.null(filtered())) {
+      if (input$dem == "Household.Income" || input$dem == "Age") {
+        #age.and.income <- ggplot(data = filtered()) + 
         #geom_point(mapping = aes_string(x = "place", 
-                                        #y = "holder")) 
-
-
-    } else if (input$dem == "Education") {
-      education.data <- filtered() %>% 
-        group_by(`Education`) %>% 
-        summarise_each(funs(mean(as.numeric(.), na.rm = TRUE)))
-      education.long <- gather(education.data, key = Country, value = Average, 
-                              Algeria:Ireland)
-      education.long <- education.long %>% 
-        filter(Education != "") %>% 
-        group_by(`Education`) %>% 
-        arrange(desc(`Average`))%>% 
-        top_n(10)
-      
-      p <- ggplot(data = education.long) +
-        geom_point(mapping = aes(x = `Education`, y = `Average`, color = `Country`))
-      return(p)
-      
-    } else { #gender 
-      
-      # Females
-      females.data <- getFilteredGender(filtered(), "Female")
-      
-      p <- ggplot(data = females.data) +
+                                            #y = "holder")) 
+    
+    
+      } else if (input$dem == "Education") {
+        education.data <- filtered() %>% 
+          group_by(`Education`) %>% 
+          summarise_each(funs(mean(as.numeric(.), na.rm = TRUE)))
+        education.long <- gather(education.data, key = Country, value = Average, 
+                                  Algeria:Ireland)
+        education.long <- education.long %>% 
+          filter(Education != "") %>% 
+          group_by(`Education`) %>% 
+          arrange(desc(`Average`))%>% 
+          top_n(10)
+          
+        p <- ggplot(data = education.long) +
+          geom_point(mapping = aes(x = `Education`, y = `Average`, color = `Country`))
+        return(p)
+          
+      } else { #gender 
+          
+        # Females
+        females.data <- getFilteredGender(filtered(), "Female")
+          
+        p <- ggplot(data = females.data) +
         geom_bar(mapping = aes(x = `Country`, y=`Average`, width = 0.4, fill = `Average`),
-                 stat = "identity") + 
+                stat = "identity") + 
         scale_x_discrete(limits= females.data$Country) + 
         labs(title = "Top 10 Countries' Cuisines enjoyed by Females",
-             x = "Country that Traditional Cuisine is From",
-             y = "Average Rating (Scale 1-5)")
-      return(p)
-    }
+            x = "Country that Traditional Cuisine is From",
+            y = "Average Rating (Scale 1-5)")
+        return(p)
+      }
+    }  
   })
     
   filtered <- reactive({
+    if (chosen.region() != "") {
     data <- food %>% 
-      filter(census.region == "Pacific") %>% 
+      filter(census.region == chosen.region()) %>% 
       select_(input$dem, "Algeria:Ireland")
     
     return(data)
+    }
   })
   
   getFilteredGender <- function(data, gender) {
@@ -172,17 +176,21 @@ my.server <- function(input, output) {
   }
   
   # creates a reactive variable for the clicked region, converting the curveNumber to the region name
- 
   chosen.region <- reactive({
     region.number <- event_data("plotly_click")
+    if (!is.null(region.number)) {
     region.number <- region.number$curveNumber
     
     # dictionary of region curveNumbers to corresponding region names
-    region.names <- list("0" = "East North Central", "1" = "East South Central", "2" = "Middle Atlantic", "3" = "Mountain", "4" = "New England", "5" = "Pacific", "6" = "South Atlantic", "7" = "West North Central", "8" = "West South Central", "9" = "East South Central")
+    region.names <- list("0" = "East North Central", "1" = "East South Central", "2" = "Middle Atlantic", 
+                         "3" = "Mountain", "4" = "New England", "5" = "Pacific", "6" = "South Atlantic", 
+                         "7" = "West North Central", "8" = "West South Central", "9" = "East South Central")
     
     name <- region.names[[region.number]]
-    
     return(name)
+    } else {
+      return("")
+    }
   })
 }
 shinyServer(my.server)
