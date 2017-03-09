@@ -35,7 +35,7 @@ my.ui <- fluidPage(
         rating of certain traditional cuisines, based on various demographics such as residing region, gender,
         age, income, and level of education. Just select a region you would like to look at to begin exploring!"),
       p("Please select a region!"),
-      plotlyOutput("map"),
+      plotlyOutput("map"), hr(),
       plotlyOutput("plot"),
       plotlyOutput("plot2")
     )

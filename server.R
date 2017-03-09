@@ -151,7 +151,7 @@ my.server <- function(input, output) {
                   stat = "identity") + 
           theme(legend.position="none") +
           scale_x_discrete(limits= males.data[1:10,]$Country) + 
-          labs(title = "Top 10 Countries' Cuisines enjoyed by Males",
+          labs(title = "Top 10 Countries' Cuisines Enjoyed by Males",
               x = "Country that Traditional Cuisine is From",
               y = "Average Rating (Scale 1-5)")
         p <- ggplotly(p)
@@ -174,23 +174,28 @@ my.server <- function(input, output) {
           top_n(5)
         
         age.plot <- ggplot(data = age.long) +
-          geom_point(mapping = aes(x = Age, y = Average, color = Country), size = 5)
+          geom_point(mapping = aes(x = Age, y = Average, color = Country), size = 4) +
+          labs(title = "Top 5 Countries' Cuisines by Age",
+               x = "Age Range",
+               y = "Average Rating (Scale 1-5)")
         age.plot <- ggplotly(age.plot)
         return(age.plot)
         
       } else if(input$dem == "Household.Income") {
         
-        income.data <- filtered() %>% group_by(Household.Income) %>% 
+        income.data <- filtered() %>% filter(Household.Income != "") %>% 
+          group_by(Household.Income) %>% 
           summarise_each(funs(mean(as.numeric(.), na.rm = TRUE)))
-        income.long <- gather(income.data, key = Country, value = Average, 
-                           Algeria:Ireland)
+        income.long <- gather(income.data, key = Country, value = Average, Algeria:Ireland)
         income.long <- income.long %>% 
           group_by(Household.Income) %>% 
-          arrange(desc(`Average`))%>% 
+          arrange(desc(`Average`)) %>% 
           top_n(5)
         
         income.plot <- ggplot(data = income.long) +
-          geom_point(mapping = aes(x = Household.Income, y = Average, color = Country), size = 5)
+          geom_point(mapping = aes(x = `Household.Income`, y = `Average`, color = `Country`), 
+                     size = 4) + labs(title = "Top 5 Countries' Cuisines by Household Income",
+               x = "Household Income Range", y = "Average Rating (Scale 1-5)")
         income.plot <- ggplotly(income.plot)
         return(income.plot)
         
@@ -209,7 +214,7 @@ my.server <- function(input, output) {
         p <- ggplot(data = education.long) +
 
           geom_point(mapping = aes(x = `Education`, y = `Average`, color = `Country`), size = 4) +
-          labs(title = "Top 5 Countries' Cuisines enjoyed based on Level of Education",
+          labs(title = "Top 5 Countries' Cuisines based on Level of Education",
                x = "Level of Education (Degree)",
                y = "Average Rating (Scale 1-5)")
         
@@ -225,8 +230,8 @@ my.server <- function(input, output) {
         geom_bar(mapping = aes(x = `Country`, y=`Average`, width = 0.4, fill = `Average`),
                 stat = "identity") + 
           theme(legend.position="none") +
-        scale_x_discrete(limits= females.data$Country)
-        labs(title = "Top 10 Countries' Cuisines enjoyed by Females",
+        scale_x_discrete(limits= females.data$Country) +
+        labs(title = "Top 10 Countries' Cuisines Enjoyed by Females",
             x = "Country that Traditional Cuisine is From",
             y = "Average Rating (Scale 1-5)")
         p <- ggplotly(p)
