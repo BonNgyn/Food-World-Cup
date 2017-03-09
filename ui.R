@@ -5,7 +5,7 @@ library(tidyr)
 library(rsconnect)
 library(plotly)
 
-my.ui <- fluidPage(
+my.ui <- fluidPage(theme = "bootstrap.css",
   # Creates a title panel to introduce an overview of the report
   titlePanel("Food World Cup"),
   
@@ -16,7 +16,8 @@ my.ui <- fluidPage(
     Our interactive plot attempts to answer some (and more) of these questions, by presenting the average 
     rating of certain traditional cuisines, based on various demographics such as residing region, gender,
     age, income, and level of education. Just select a region you would like to look at to begin exploring!"),
-  p("Please select a region!"),
+  hr(),
+  h4(strong("Please select a region!")),
   plotlyOutput("map"), hr(),
   fluidRow(
     column(5, offset = 4, 
