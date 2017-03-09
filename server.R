@@ -7,66 +7,6 @@ library(mapproj)
 
 my.server <- function(input, output) {
   ########################
-  ## Map Initialization ##
-  ########################
-  
-  # initialize US map
-  us.map <-  map_data('state')
-  
-  # add US Census Regions to us.maps data frame
-  us.map$census.region[us.map$region %in% 
-                         c("maine", "vermont", "new hampshire", "massachusetts", "connecticut", "rhode island")] <- "New England"
-  us.map$census.region[us.map$region %in% 
-                         c("new jersey", "new york", "pennsylvania")] <- "Middle Atlantic"
-  us.map$census.region[us.map$region %in% 
-                         c("illinois", "indiana", "michigan", "ohio", "wisconsin")] <- "East North Central"
-  us.map$census.region[us.map$region %in% 
-                         c("iowa", "kansas", "minnesota", "missouri", "nebraska", "north dakota", "south dakota")] <- "West North Central"
-  us.map$census.region[us.map$region %in% 
-                         c("delaware", "district of columbia", "maryland",
-                           "west virginia", "virginia", "north carolina", "south carolina", "georgia", "florida")] <- "South Atlantic"
-  us.map$census.region[us.map$region %in% 
-                         c("alabama", "kentucky", "mississippi", "tennessee")] <- "East South Central"
-  us.map$census.region[us.map$region %in% 
-                         c("arkansas", "louisiana", "oklahoma", "texas")] <- "West South Central"
-  us.map$census.region[us.map$region %in% 
-                         c("arizona", "montana", "idaho", "wyoming", "utah", "colorado", "nevada", "new mexico")] <- "Mountain"
-  us.map$census.region[us.map$region %in% 
-                         c("washington", "oregon", "alaska", "california", "hawaii")] <- "Pacific"
-  
-  # subset the dataframe by census regions and move lat/lon accordingly
-  us.map$lat.transp[us.map$census.region == "New England"] <- us.map$lat[us.map$census.region == "New England"]
-  us.map$long.transp[us.map$census.region == "New England"] <- us.map$long[us.map$census.region == "New England"]
-  
-  us.map$lat.transp[us.map$census.region == "Middle Atlantic"] <- us.map$lat[us.map$census.region == "Middle Atlantic"]
-  us.map$long.transp[us.map$census.region == "Middle Atlantic"] <- us.map$long[us.map$census.region == "Middle Atlantic"]
-  
-  us.map$lat.transp[us.map$census.region == "East North Central"] <- us.map$lat[us.map$census.region == "East North Central"]
-  us.map$long.transp[us.map$census.region == "East North Central"] <- us.map$long[us.map$census.region == "East North Central"]
-  
-  us.map$lat.transp[us.map$census.region == "West North Central"] <- us.map$lat[us.map$census.region == "West North Central"]
-  us.map$long.transp[us.map$census.region == "West North Central"] <- us.map$long[us.map$census.region == "West North Central"]
-  
-  us.map$lat.transp[us.map$census.region == "South Atlantic"] <- us.map$lat[us.map$census.region == "South Atlantic"]
-  us.map$long.transp[us.map$census.region == "South Atlantic"] <- us.map$long[us.map$census.region == "South Atlantic"]
-  
-  us.map$lat.transp[us.map$census.region == "East South Central"] <- us.map$lat[us.map$census.region == "East South Central"]
-  us.map$long.transp[us.map$census.region == "East South Central"] <- us.map$long[us.map$census.region == "East South Central"]
-  
-  us.map$lat.transp[us.map$census.region == "West South Central"] <- us.map$lat[us.map$census.region == "West South Central"]
-  us.map$long.transp[us.map$census.region == "West South Central"] <- us.map$long[us.map$census.region == "West South Central"]
-  
-  us.map$lat.transp[us.map$census.region == "Mountain"] <- us.map$lat[us.map$census.region == "Mountain"]
-  us.map$long.transp[us.map$census.region == "Mountain"] <- us.map$long[us.map$census.region == "Mountain"]
-  
-  us.map$lat.transp[us.map$census.region == "Pacific"] <- us.map$lat[us.map$census.region == "Pacific"]
-  us.map$long.transp[us.map$census.region == "Pacific"] <- us.map$long[us.map$census.region == "Pacific"]
-  
-  # creates list of labels for each of the census regions
-  regs <- aggregate(cbind(long.transp, lat.transp) ~ census.region, data = us.map, 
-                    FUN = function(x)mean(range(x)))
-  
-  ########################
   ## Reactive Functions ##
   ########################
   
@@ -215,10 +155,13 @@ my.server <- function(input, output) {
           arrange(desc(`Average`)) %>% 
           top_n(5)
         
+        income <- (income.long$Household.Income)
+        income <- gsub('[$]', '', income)
+        
         income.plot <- ggplot(data = income.long) +
-          geom_point(mapping = aes(x = `Household.Income`, y = `Average`, color = `Country`), 
+          geom_point(mapping = aes(income, income.long$Average, color = income.long$Country), 
                      size = 4) + labs(title = "Top 5 Countries' Cuisines by Household Income",
-               x = "Household Income Range", y = "Average Rating (Scale 1-5)")
+                                      x = "Household Income Range", y = "Average Rating (Scale 1-5)")
         income.plot <- ggplotly(income.plot)
         return(income.plot)
         
