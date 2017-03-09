@@ -54,6 +54,5 @@ for(region in regions){
 regs <- aggregate(cbind(long.transp, lat.transp) ~ census.region, data = us.map, 
                   FUN = function(x)mean(range(x)))
 
-top.range <- c(1, length(countries.names))
 
 mshinyApp(my.ui, my.server)
