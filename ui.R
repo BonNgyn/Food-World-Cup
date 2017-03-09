@@ -37,6 +37,9 @@ my.ui <- fluidPage(theme = "bootstrap.css",
          h4(strong("Please select a region!")),
          
          plotlyOutput("map", width = 900, height = 650), hr(),
+         tags$h5('Top Cuisines'), 
+         tags$body('This bar graph initially displays the top ten rated cuisines from all regions, meaning the whole United States. 
+                   Selecting a region will tailor the bar graph to display the top ten rated cuisines from that region.'),
          plotlyOutput('top.food'), hr()
   ), 
   # Outputs the various demographic plot(s)
@@ -48,7 +51,7 @@ my.ui <- fluidPage(theme = "bootstrap.css",
                           "Age" = "Age",
                           "Gender" = "Gender"))
     )
-  ), p(strong(textOutput('region.name', inline=TRUE))),
+  ),p(strong(textOutput('region.name', inline=TRUE))),
   # Outputs the various demographic plot descriptions
   p(textOutput('plot.desc', inline=TRUE)),
   plotlyOutput("plot"),

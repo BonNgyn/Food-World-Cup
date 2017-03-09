@@ -283,11 +283,17 @@ my.server <- function(input, output) {
       title = "Average Rating (1-5)",
       titlefont = f
     )
+    title <- "Top 10 Rated Cuisines in the... "
+    if(is.null(chosen.region)) {
+      title <- paste0(title, 'United States')
+    } else {
+      title <- paste0(title, chosen.region())
+    }
     
     countries <- factor(GetFilteredTop()$countries.names, 
                         levels = unique(GetFilteredTop()$countries.names)[order(GetFilteredTop()$means, decreasing = TRUE)])
     p <- plot_ly(x = countries, y = GetFilteredTop()$means, type = "bar") %>% 
-      layout(title = "Top 10 Rated Cuisines", titlefont = f) %>% 
+      layout(title = title, chosen.region(), titlefont = f) %>% 
       layout(xaxis = x, yaxis = y)
     return(p)
   })
