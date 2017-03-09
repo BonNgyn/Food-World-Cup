@@ -1,7 +1,8 @@
 library(shiny)
 library(ggplot2)
 library(dplyr)
-library("mapproj")
+library(tidyr)
+library(mapproj)
 
 my.server <- function(input, output) {
   # initialize food world cup data frame
@@ -70,6 +71,56 @@ my.server <- function(input, output) {
   regs <- aggregate(cbind(long.transp, lat.transp) ~ census.region, data = us.map, 
                     FUN = function(x)mean(range(x)))
   
+  ########################
+  ## Reactive Functions ##
+  ########################
+  
+  filtered <- reactive({
+    if (chosen.region() != "") {
+      data <- food %>% 
+        filter(census.region == chosen.region()) %>% 
+        select_(input$dem, "Algeria:Ireland")
+      
+      return(data)
+    }
+  })
+  
+  # creates a reactive variable for the clicked region, converting the curveNumber to the region name
+  chosen.region <- reactive({
+    region.number <- event_data("plotly_click")
+    if (!is.null(region.number)) {
+      region.number <- region.number$curveNumber
+      
+      # dictionary of region curveNumbers to corresponding region names
+      region.names <- c("East North Central", "East South Central", "Middle Atlantic", 
+                        "Mountain", "New England", "Pacific", "South Atlantic", 
+                        "West North Central", "West South Central")
+      
+      name <- region.names[region.number + 1]
+      return(name)
+    } else {
+      return("")
+    }
+  })
+  ######################
+  
+  getFilteredGender <- function(data, gender) {
+    
+    filtered.data <- data %>% 
+      group_by(`Gender`) %>% 
+      summarise_each(funs(mean(as.numeric(.), na.rm = TRUE)))
+    
+    gender.data <- filtered.data %>% 
+      filter(`Gender` == gender)
+    gender.data <- gender.data[-1] %>% 
+      t() %>% 
+      as.data.frame() %>% 
+      mutate(Country = rownames(.)) %>% 
+      arrange(desc(`V1`))
+    colnames(gender.data) <- c("Average", "Country")  
+    return(gender.data[1:10,])
+  }
+  
   # create the US map with the census regions separated
   output$map <- renderPlotly({
     region.gg <- ggplot(us.map, aes(x = long.transp, y = lat.transp), colour = "white") + 
@@ -109,12 +160,38 @@ my.server <- function(input, output) {
   
   output$plot <- renderPlot({
     if (!is.null(filtered())) {
-      if (input$dem == "Household.Income" || input$dem == "Age") {
-        #age.and.income <- ggplot(data = filtered()) + 
-        #geom_point(mapping = aes_string(x = "place", 
-                                            #y = "holder")) 
-    
-    
+      if (input$dem == "Age") {
+        
+        age.data <- filtered() %>% group_by(Age) %>% 
+          summarise_each(funs(mean(as.numeric(.), na.rm = TRUE)))
+        age.long <- gather(age.data, key = Country, value = Average, 
+                                 Algeria:Ireland)
+        age.long <- age.long %>% 
+          group_by(Age) %>% 
+          arrange(desc(`Average`))%>% 
+          top_n(5)
+        
+        age.plot <- ggplot(data = age.long) +
+          geom_point(mapping = aes(x = Age, y = Average, color = Country), size = 5)
+          
+        return(age.plot)
+        
+      } else if(input$dem == "Household.Income") {
+        
+        income.data <- filtered() %>% group_by(Household.Income) %>% 
+          summarise_each(funs(mean(as.numeric(.), na.rm = TRUE)))
+        income.long <- gather(income.data, key = Country, value = Average, 
+                           Algeria:Ireland)
+        income.long <- income.long %>% 
+          group_by(Household.Income) %>% 
+          arrange(desc(`Average`))%>% 
+          top_n(5)
+        
+        income.plot <- ggplot(data = income.long) +
+          geom_point(mapping = aes(x = Household.Income, y = Average, color = Country), size = 5)
+        
+        return(income.plot)
+        
       } else if (input$dem == "Education") {
         education.data <- filtered() %>% 
           group_by(`Education`) %>% 
@@ -145,52 +222,8 @@ my.server <- function(input, output) {
             y = "Average Rating (Scale 1-5)")
         return(p)
       }
-    }  
-  })
-    
-  filtered <- reactive({
-    if (chosen.region() != "") {
-    data <- food %>% 
-      filter(census.region == chosen.region()) %>% 
-      select_(input$dem, "Algeria:Ireland")
-    
-    return(data)
-    }
-  })
-  
-  getFilteredGender <- function(data, gender) {
-    
-    filtered.data <- data %>% 
-      group_by(`Gender`) %>% 
-      summarise_each(funs(mean(as.numeric(.), na.rm = TRUE)))
-    
-    gender.data <- filtered.data %>% 
-      filter(`Gender` == gender)
-    gender.data <- gender.data[-1] %>% 
-      t() %>% 
-      as.data.frame() %>% 
-      mutate(Country = rownames(.)) %>% 
-      arrange(desc(`V1`))
-    colnames(gender.data) <- c("Average", "Country")  
-    return(gender.data[1:10,])
-  }
-  
-  # creates a reactive variable for the clicked region, converting the curveNumber to the region name
-  chosen.region <- reactive({
-    region.number <- event_data("plotly_click")
-    if (!is.null(region.number)) {
-    region.number <- region.number$curveNumber
-    
-    # dictionary of region curveNumbers to corresponding region names
-    region.names <- c("East North Central", "East South Central", "Middle Atlantic", 
-                         "Mountain", "New England", "Pacific", "South Atlantic", 
-                        "West North Central", "West South Central")
-    
-    name <- region.names[region.number + 1]
-    return(name)
-    } else {
-      return("")
     }
   })
 }
+
 shinyServer(my.server)
