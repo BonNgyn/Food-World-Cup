@@ -27,6 +27,12 @@ my.ui <- fluidPage(
     # between a plot of the filtered data or a table of the filterd data. Both data forms have a 
     # short summary attached to the end to extend its usability.
     mainPanel(
+      p("Welcome to Food World Cup! Ever wonder what traditional cuisines people prefer based on what region
+        of the U.S. they reside in? Or maybe if individuals with higher/lower income prefer a certain cuisine?
+        Our interactive plot attempts to answer some (and more) of these questions, by presenting the average 
+        rating of certain traditional cuisines, based on various demographics such as residing region, gender,
+        age, income, and level of education. Just select a region you would like to look at to begin exploring!"),
+      p("Please select a region!"),
       plotlyOutput("map"),
       plotOutput("plot"),
       plotOutput("plot2")
