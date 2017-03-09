@@ -26,7 +26,8 @@ my.ui <- fluidPage(
                           "Age" = "Age",
                           "Gender" = "Gender"))
     )
-  ),
+  ), p(strong(textOutput('region.name', inline=TRUE))),
+  p(textOutput('plot.desc', inlin=TRUE)),
   plotlyOutput("plot"),
   plotlyOutput("plot2")
 )
