@@ -182,11 +182,11 @@ my.server <- function(input, output) {
     region.number <- region.number$curveNumber
     
     # dictionary of region curveNumbers to corresponding region names
-    region.names <- list("0" = "East North Central", "1" = "East South Central", "2" = "Middle Atlantic", 
-                         "3" = "Mountain", "4" = "New England", "5" = "Pacific", "6" = "South Atlantic", 
-                         "7" = "West North Central", "8" = "West South Central", "9" = "East South Central")
+    region.names <- c("East North Central", "East South Central", "Middle Atlantic", 
+                         "Mountain", "New England", "Pacific", "South Atlantic", 
+                        "West North Central", "West South Central")
     
-    name <- region.names[[region.number]]
+    name <- region.names[region.number + 1]
     return(name)
     } else {
       return("")
