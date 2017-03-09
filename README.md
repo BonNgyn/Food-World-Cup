@@ -1,6 +1,5 @@
-<snippet>
-  <content><![CDATA[
-# ${1:Food World Cup}
+
+# Food World Cup
 Ever wondered what traditional cuisines people prefer based on what region of the U.S. they reside in? Or maybe if individuals with higher/lower income prefer a certain cuisine? Our interactive plot attempts to answer some (and more) of these questions, by presenting the highest rated traditional cuisines, based on individuals' various demographics such as residing region, gender, age, income, and level of education. Just select a region you would like to look at to begin exploring from [here](https://bonngyn.shinyapps.io/food-world-cup/)!
 
 ## Purpose
@@ -61,7 +60,3 @@ Each team member had a primary portion of the project to complete.
 `us.map` (Erika Y.)
 - a data frame that contains all of the US states (inherited from the `map_data('state')` data frame provided by R), and groups them by their respective US Census Region.
 - the framework for making the actual map visualization with `plotly` for `output$plot`
-
-]]></content>
-  <tabTrigger>readme</tabTrigger>
-</snippet>
