@@ -126,7 +126,6 @@ my.server <- function(input, output) {
   output$map <- renderPlotly({
     region.gg <- ggplot(us.map, aes(x = long.transp, y = lat.transp), colour = "white") + 
       geom_polygon(aes(text = census.region, group = group, fill = census.region), colour = 'white') +
-      geom_text(data = regs, aes(long.transp, lat.transp, label = census.region), size = 3) +
       theme(panel.background = element_blank(),  # remove background
             panel.grid = element_blank(), 
             axis.line = element_blank(), 
@@ -150,6 +149,7 @@ my.server <- function(input, output) {
         p <- ggplot(data = males.data[1:10,]) +
           geom_bar(mapping = aes(x = `Country`, y=`Average`, width = 0.4, fill = `Average`),
                   stat = "identity") + 
+          theme(legend.position="none") +
           scale_x_discrete(limits= males.data[1:10,]$Country) + 
           labs(title = "Top 10 Countries' Cuisines enjoyed by Males",
               x = "Country that Traditional Cuisine is From",
@@ -204,14 +204,18 @@ my.server <- function(input, output) {
           filter(Education != "") %>% 
           group_by(`Education`) %>% 
           arrange(desc(`Average`))%>% 
-          top_n(10)
+          top_n(5)
           
         p <- ggplot(data = education.long) +
-          geom_point(mapping = aes(x = `Education`, y = `Average`, color = `Country`), size = 5)
-        p <- ggplotly(p)
+
+          geom_point(mapping = aes(x = `Education`, y = `Average`, color = `Country`), size = 4) +
+          labs(title = "Top 5 Countries' Cuisines enjoyed based on Level of Education",
+               x = "Level of Education (Degree)",
+               y = "Average Rating (Scale 1-5)")
         
+        p <- ggplotly(p)
         return(p)
-          
+
       } else { #gender 
           
         # Females
@@ -220,7 +224,8 @@ my.server <- function(input, output) {
         p <- ggplot(data = females.data) +
         geom_bar(mapping = aes(x = `Country`, y=`Average`, width = 0.4, fill = `Average`),
                 stat = "identity") + 
-        scale_x_discrete(limits= females.data$Country) + 
+          theme(legend.position="none") +
+        scale_x_discrete(limits= females.data$Country)
         labs(title = "Top 10 Countries' Cuisines enjoyed by Females",
             x = "Country that Traditional Cuisine is From",
             y = "Average Rating (Scale 1-5)")
@@ -229,7 +234,5 @@ my.server <- function(input, output) {
       }
     }
   })
-  
-  
 }
 shinyServer(my.server)
