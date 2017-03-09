@@ -98,6 +98,9 @@ my.server <- function(input, output) {
                         "West North Central", "West South Central")
       
       name <- region.names[region.number + 1]
+      output$region.name = renderText({
+        return(paste("You are currently looking at the ", name, " region"))
+      })
       return(name)
     } else {
       return("")
@@ -143,6 +146,7 @@ my.server <- function(input, output) {
   output$plot2 <- renderPlotly({
     if (!is.null(filtered())) {
       if (input$dem == "Gender") {
+        
         # Males
         males.data <- getFilteredGender(filtered(), "Male")
           
@@ -164,6 +168,13 @@ my.server <- function(input, output) {
     if (!is.null(filtered())) {
       if (input$dem == "Age") {
         
+        output$plot.desc = renderText({
+          return(paste("The plot below displays the top 5 highest rated cuisines for various
+                      age buckets (18-29, 30-44, 45-60, >60). For each bucket, the top 5 highest 
+                      rated cuisines are displayed with circles, the highest rated cuisine at 
+                      the top and the lowest rated cuisine at the bottom."))
+        })
+        
         age.data <- filtered() %>% group_by(Age) %>% 
           summarise_each(funs(mean(as.numeric(.), na.rm = TRUE)))
         age.long <- gather(age.data, key = Country, value = Average, 
@@ -180,6 +191,13 @@ my.server <- function(input, output) {
         
       } else if(input$dem == "Household.Income") {
         
+        output$plot.desc = renderText({
+          return(paste("The plot below displays the top 5 highest rated cuisines for various income 
+                       buckets. For each bucket, the top 5 highest rated cuisines are displayed 
+                       with circles, the highest rated cuisine at the top and the lowest rated 
+                       cuisine at the bottom."))
+        })
+        
         income.data <- filtered() %>% group_by(Household.Income) %>% 
           summarise_each(funs(mean(as.numeric(.), na.rm = TRUE)))
         income.long <- gather(income.data, key = Country, value = Average, 
@@ -195,6 +213,14 @@ my.server <- function(input, output) {
         return(income.plot)
         
       } else if (input$dem == "Education") {
+        
+        output$plot.desc = renderText({
+          return(paste("The plot below displays the top 5 highest rated cuisines for various levels 
+                       of education. For each bucket, the top 5 highest rated cuisines are
+                       displayed with circles, the highest rated cuisine at the top and the lowest
+                       rated cuisine at the bottom."))
+        })
+        
         education.data <- filtered() %>% 
           group_by(`Education`) %>% 
           summarise_each(funs(mean(as.numeric(.), na.rm = TRUE)))
@@ -217,6 +243,13 @@ my.server <- function(input, output) {
         return(p)
 
       } else { #gender 
+        
+        output$plot.desc = renderText({
+          return(paste("The plot below displays the top 10 highest rated cuisines for both genders.
+                       Each bar's height represents that cuisines average rating. The highest rated
+                       cuisine is on the left side of the graph, and the lowest rated cuisine on the
+                       right side."))
+        })
           
         # Females
         females.data <- getFilteredGender(filtered(), "Female")
