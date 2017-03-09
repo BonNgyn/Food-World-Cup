@@ -29,19 +29,33 @@ my.ui <- fluidPage(
     # short summary attached to the end to extend its usability.
     mainPanel(tags$style(type="text/css", ".shiny-output-error { visibility: hidden; }",
               ".shiny-output-error:before { visibility: hidden; }"),
+      
+      # Introduction paragraph                  
       p("Welcome to Food World Cup! Ever wonder what traditional cuisines people prefer based
         on what region of the U.S. they reside in? Or maybe if individuals with higher/lower 
         income prefer a certain cuisine? Our interactive plot attempts to answer some (and more) 
         of these questions, by presenting the highest rated traditional cuisines, based on
         individuals' various demographics such as residing region, gender, age, income, and level of 
         education. Just select a region you would like to look at to begin exploring!"),
+      
+      # Sources paragraph
       p("The data set used for this interactive visualization is  from FiveThirtyEight, a popular
         interactive news and sports site that writes data-driven articles. Original data - 
         (https://github.com/fivethirtyeight/data/tree/master/food-world-cup)"),
+      
+      # Asks the user to select a region on the map
       p("Please select a region!"),
+      
+      # Displays the map of the U.S.
       plotlyOutput("map"),
+      
+      # Outputs what region the user has most recently clicked on
       p(strong(textOutput('region.name', inline=TRUE))),
-      p(textOutput('plot.desc', inlin=TRUE)),
+      
+      # Outputs the various demographic plot descriptions
+      p(textOutput('plot.desc', inline=TRUE)),
+      
+      # Outputs the various demographic plot(s)
       plotlyOutput("plot"),
       plotlyOutput("plot2")
     )

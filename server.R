@@ -76,6 +76,8 @@ my.server <- function(input, output) {
   ## Reactive Functions ##
   ########################
   
+  # Creates a reactive variable for filtered data frames based on which demographic 
+  # the user selects
   filtered <- reactive({
     if (chosen.region() != "") {
       data <- food %>% 
@@ -98,9 +100,12 @@ my.server <- function(input, output) {
                         "West North Central", "West South Central")
       
       name <- region.names[region.number + 1]
+      
+      # Creates a reactive render text so that the displayed, current selected region can update
       output$region.name = renderText({
         return(paste("You are currently looking at the ", name, " region"))
       })
+      
       return(name)
     } else {
       return("")
@@ -108,8 +113,11 @@ my.server <- function(input, output) {
   })
   ######################
   
+  # Accepts a data frame and gender and filters the df returned by filtered() to only
+  # include gender and average ratings for all traditional cuisines
   getFilteredGender <- function(data, gender) {
     
+    # Computes the average rating for each traditional cuisine
     filtered.data <- data %>% 
       group_by(`Gender`) %>% 
       summarise_each(funs(mean(as.numeric(.), na.rm = TRUE)))
@@ -144,12 +152,14 @@ my.server <- function(input, output) {
   })
   
   output$plot2 <- renderPlotly({
-    if (!is.null(filtered())) {
+    if (!is.null(filtered())) { # checks if any region has been clicked yet
       if (input$dem == "Gender") {
         
-        # Males
+        # Uses the getFilteredGender function to filter the food df to only include the Male gender
+        # and average ratings for cuisines
         males.data <- getFilteredGender(filtered(), "Male")
-          
+         
+        # Plots the males.data df on a bar graph  
         p <- ggplot(data = males.data[1:10,]) +
           geom_bar(mapping = aes(x = `Country`, y=`Average`, width = 0.4, fill = `Average`),
                   stat = "identity") + 
@@ -165,9 +175,10 @@ my.server <- function(input, output) {
   })
   
   output$plot <- renderPlotly({
-    if (!is.null(filtered())) {
+    if (!is.null(filtered())) { # checks if any region has been clicked yet
       if (input$dem == "Age") {
         
+        # Outputs the description for the age plot
         output$plot.desc = renderText({
           return(paste("The plot below displays the top 5 highest rated cuisines for various
                       age buckets (18-29, 30-44, 45-60, >60). For each bucket, the top 5 highest 
@@ -219,6 +230,7 @@ my.server <- function(input, output) {
         
       } else if (input$dem == "Education") {
         
+        # Outputs the description for the level of education plot
         output$plot.desc = renderText({
           return(paste("The plot below displays the top 5 highest rated cuisines for various levels 
                        of education. For each bucket, the top 5 highest rated cuisines are
@@ -226,6 +238,8 @@ my.server <- function(input, output) {
                        rated cuisine at the bottom."))
         })
         
+        # Filters the education data to only include the level of education and food ratings;
+        # computes the average rating for each type of cuisine
         education.data <- filtered() %>% 
           group_by(`Education`) %>% 
           summarise_each(funs(mean(as.numeric(.), na.rm = TRUE)))
@@ -236,9 +250,9 @@ my.server <- function(input, output) {
           group_by(`Education`) %>% 
           arrange(desc(`Average`))%>% 
           top_n(5)
-          
+        
+        # Plots the education data frame on a scatter plot  
         p <- ggplot(data = education.long) +
-
           geom_point(mapping = aes(x = `Education`, y = `Average`, color = `Country`), size = 4) +
           labs(title = "Top 5 Countries' Cuisines based on Level of Education",
                x = "Level of Education (Degree)",
@@ -249,6 +263,7 @@ my.server <- function(input, output) {
 
       } else { #gender 
         
+        # Outputs the description for the gender plot
         output$plot.desc = renderText({
           return(paste("The plot below displays the top 10 highest rated cuisines for both genders.
                        Each bar's height represents that cuisines average rating. The highest rated
@@ -256,9 +271,11 @@ my.server <- function(input, output) {
                        right side."))
         })
           
-        # Females
+        # Uses the getFilteredGender function to filter the food df to only include the Female gender
+        # and average ratings for cuisines
         females.data <- getFilteredGender(filtered(), "Female")
-          
+        
+        # Plots the filtered female data frame  
         p <- ggplot(data = females.data) +
         geom_bar(mapping = aes(x = `Country`, y=`Average`, width = 0.4, fill = `Average`),
                 stat = "identity") + 
