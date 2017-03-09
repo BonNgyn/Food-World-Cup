@@ -155,10 +155,13 @@ my.server <- function(input, output) {
           arrange(desc(`Average`)) %>% 
           top_n(5)
         
+        income <- (income.long$Household.Income)
+        income <- gsub('[$]', '', income)
+        
         income.plot <- ggplot(data = income.long) +
-          geom_point(mapping = aes(x = `Household.Income`, y = `Average`, color = `Country`), 
+          geom_point(mapping = aes(income, income.long$Average, color = income.long$Country), 
                      size = 4) + labs(title = "Top 5 Countries' Cuisines by Household Income",
-               x = "Household Income Range", y = "Average Rating (Scale 1-5)")
+                                      x = "Household Income Range", y = "Average Rating (Scale 1-5)")
         income.plot <- ggplotly(income.plot)
         return(income.plot)
         
