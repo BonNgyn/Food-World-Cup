@@ -55,4 +55,4 @@ regs <- aggregate(cbind(long.transp, lat.transp) ~ census.region, data = us.map,
                   FUN = function(x)mean(range(x)))
 
 
-mshinyApp(my.ui, my.server)
+shinyApp(my.ui, my.server)
