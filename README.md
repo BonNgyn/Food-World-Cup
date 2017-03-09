@@ -21,6 +21,7 @@ If you want to change the region or any of the filters, simply go back to the wi
 Our raw data was collected from the fivethirtyeight [Food World Cup repo](https://github.com/fivethirtyeight/data/tree/master/food-world-cup). In order to wrangle with this data to make it work with our intended purpose, we also had to utilize the `map_data('state')` data frame that is provided in the R library.
 
 Each team member had a primary portion of the project to complete.
+
 **Dustin L.**
 - built `ggplot` visualizations for `Age` and  `Household.Income` correlations with cuisine preferences
 - contributed to UI layout
