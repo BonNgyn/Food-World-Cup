@@ -45,7 +45,7 @@ my.ui <- fluidPage(theme = "bootstrap.css",
     )
   ), p(strong(textOutput('region.name', inline=TRUE))),
   # Outputs the various demographic plot descriptions
-  p(textOutput('plot.desc', inlin=TRUE)),
+  p(textOutput('plot.desc', inline=TRUE)),
   plotlyOutput("plot"),
   plotlyOutput("plot2")
 )
